@@ -49,7 +49,7 @@ class Network(object):
                 subnet_list = [address]
             else:
                 subnet_list = list(ip.ip_network(parent, strict=False).subnets(new_prefix=int(cidr)))
-        self.subnet_list = subnet_list                  # Needed for subsequent calls
+        self.subnet_list = subnet_list  # Needed for subsequent calls
         return subnet_list
 
     def get_host_number(self):
@@ -90,7 +90,7 @@ class Network(object):
     def print_specific_subnet(self):
         show = True
         while show:
-            subnet_id = input("Enter subnet # to show (0 to {}) or empty for none: ".format(len(self.subnet_list)-1))
+            subnet_id = input("Enter subnet # to show (0 to {}) or empty for none: ".format(len(self.subnet_list) - 1))
             print()
             if subnet_id is not "":
                 print("This is subnet {}".format(subnet_id))

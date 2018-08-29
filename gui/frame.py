@@ -27,14 +27,14 @@ class AddressFrame(Frame):
         octet_3 = StringVar()
         cidr = StringVar()
 
-        self.octet_entry_0 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_0)
-        self.octet_entry_0.limit = 255
-        self.octet_entry_1 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_1)
-        self.octet_entry_1.limit = 255
-        self.octet_entry_2 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_2)
-        self.octet_entry_2.limit = 255
-        self.octet_entry_3 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_3)
-        self.octet_entry_3.limit = 255
+        self.octet_0 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_0)
+        self.octet_0.limit = 255
+        self.octet_1 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_1)
+        self.octet_1.limit = 255
+        self.octet_2 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_2)
+        self.octet_2.limit = 255
+        self.octet_3 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_3)
+        self.octet_3.limit = 255
         self.octet_cidr = ValidatingEntry(self.add_octets, width=2, textvariable=cidr)
         self.octet_cidr.limit = 32
 
@@ -67,6 +67,7 @@ class AddressFrame(Frame):
                                       variable=self.custom, value=True, command=self.show_custom_net)
         self.custom_no = Radiobutton(self.custom_frame, state=DISABLED, text="No",
                                      variable=self.custom, value=False, command=self.show_custom_net)
+        # self.custom.set(False)
 
         self.custom_cidr = Frame(self.custom_frame)
         self.cidr_label = Label(self.custom_cidr, text="Enter custom CIDR:")
@@ -74,16 +75,19 @@ class AddressFrame(Frame):
         self.cidr_entry = ValidatingEntry(self.custom_cidr, state=DISABLED, width=2, textvariable=new_cidr)
         self.cidr_entry.limit = 32
 
+        self.error_display = Text(self.master, width=55, height=2)
+        sys.stderr = OutputRedirector(self.error_display)
+
         self.add_label.grid(row=0, column=0, padx=5)
         self.add_octets.grid(row=0, column=1)
         # Contents of self.add_octets - start
-        self.octet_entry_0.pack(side=LEFT)
+        self.octet_0.pack(side=LEFT)
         self.octet_sep_0.pack(side=LEFT)
-        self.octet_entry_1.pack(side=LEFT)
+        self.octet_1.pack(side=LEFT)
         self.octet_sep_1.pack(side=LEFT)
-        self.octet_entry_2.pack(side=LEFT)
+        self.octet_2.pack(side=LEFT)
         self.octet_sep_2.pack(side=LEFT)
-        self.octet_entry_3.pack(side=LEFT)
+        self.octet_3.pack(side=LEFT)
         self.octet_sep_3.pack(side=LEFT)
         self.octet_cidr.pack(side=LEFT)
         # Contents of self.add_octets - end
@@ -94,20 +98,22 @@ class AddressFrame(Frame):
         self.custom_yes.grid(row=0, column=1)
         self.custom_no.grid(row=0, column=2)
         self.custom_cidr.grid(row=2, column=0)
-        self.cidr_label.grid(row=0, column=0)
-        self.cidr_entry.grid(row=0, column=1)
+        # Contents of self.custom_cidr - start
+        self.cidr_label.pack(side=LEFT)
+        self.cidr_entry.pack(side=LEFT)
 
         self.sub_frame = Frame(self.master)
 
         self.add_frame.grid(row=0, column=0)
         self.net_frame.grid(row=1, column=0)
         self.custom_frame.grid(row=2, column=0)
+        self.error_display.grid(row=3, column=0)
         self.sub_frame.grid(row=0, column=1)
         self.master.grid(row=0, column=0)
 
     def get_address(self):
         full_ip = self.octet_0.get() + "." + self.octet_1.get() + "." + self.octet_2.get() + "." + self.octet_3.get()
-        self.address = Address(full_ip, self.cidr.get())
+        self.address = Address(full_ip, self.octet_cidr.get())
 
         self.display_info(self.add_info)
 
@@ -142,11 +148,3 @@ class AddressFrame(Frame):
         elif text_area is self.net_info:
             self.network.print_network_information()
         text_area.config(state=DISABLED)
-
-
-class SubnetFrame(Frame):
-    def __init__(self, **kw):
-        super().__init__(**kw)
-        self.master = Frame()
-        self.label = Label(self.master, text="Subnet Information:")
-        self.label.pack()

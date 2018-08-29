@@ -10,12 +10,11 @@ eaasmek@students.eaaa.dk
 
 # from tkinter import messagebox
 from ttkthemes import themed_tk as tk
-from gui.frames import *
+
+from gui.frame import *
 
 
 class SubnetCalc(object):
-    add_frame = None
-
     def __init__(self):
         self.add_frame = AddressFrame()
 
