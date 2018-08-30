@@ -4,7 +4,6 @@ eaasmek@students.eaaa.dk
 """
 
 from gui.custom import *
-from logic.address import *
 from logic.network import *
 
 
@@ -17,108 +16,111 @@ class AddressFrame(Frame):
         super().__init__(**kw)
         self.master = Frame()
 
+        # Address
         self.add_frame = Frame(self.master)
-        self.add_label = Label(self.add_frame, text="Enter IP Address:")
-        self.add_octets = Frame(self.add_frame)
+        self.add_entry = Frame(self.add_frame)
+        self.add_octets = Frame(self.add_entry)
+
+        self.add_label = Label(self.add_entry, text="Enter IP Address:")
+        self.add_sep_0 = Label(self.add_octets, text=".")
+        self.add_sep_1 = Label(self.add_octets, text=".")
+        self.add_sep_2 = Label(self.add_octets, text=".")
+        self.add_sep_3 = Label(self.add_octets, text="/")
+
+        self.add_button = Button(self.add_entry, text="OK", width=3, command=self.get_address)
+        self.add_info = Text(self.add_frame, state=DISABLED, width=55, height=4)
 
         octet_0 = StringVar()
         octet_1 = StringVar()
         octet_2 = StringVar()
         octet_3 = StringVar()
+        octets = [octet_0, octet_1, octet_2, octet_3]
         cidr = StringVar()
 
-        self.octet_0 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_0)
-        self.octet_0.limit = 255
-        self.octet_1 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_1)
-        self.octet_1.limit = 255
-        self.octet_2 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_2)
-        self.octet_2.limit = 255
-        self.octet_3 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_3)
-        self.octet_3.limit = 255
-        self.octet_cidr = ValidatingEntry(self.add_octets, width=2, textvariable=cidr)
-        self.octet_cidr.limit = 32
+        self.add_octet_0 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_0)
+        self.add_octet_1 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_1)
+        self.add_octet_2 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_2)
+        self.add_octet_3 = ValidatingEntry(self.add_octets, width=3, textvariable=octet_3)
+        self.add_cidr = ValidatingEntry(self.add_octets, width=2, textvariable=cidr)
 
-        octet_0.set(0)
-        octet_1.set(0)
-        octet_2.set(0)
-        octet_3.set(0)
+        octet_entries = [self.add_octet_0, self.add_octet_1, self.add_octet_2, self.add_octet_3]
+        for i in range(len(octet_entries)):
+            octet_entries[i].limit = 255
+        self.add_cidr.limit = 255
+
+        [octet.set(0) for octet in octets]
         cidr.set(24)
 
-        self.octet_sep_0 = Label(self.add_octets, text=".")
-        self.octet_sep_1 = Label(self.add_octets, text=".")
-        self.octet_sep_2 = Label(self.add_octets, text=".")
-        self.octet_sep_3 = Label(self.add_octets, text="/")
+        self.add_entry.pack()
+        self.add_label.grid(row=0, column=0)
+        self.add_octets.grid(row=0, column=1, padx=5)
+        self.add_octet_0.pack(side=LEFT)
+        self.add_sep_0.pack(side=LEFT)
+        self.add_octet_1.pack(side=LEFT)
+        self.add_octet_1.pack(side=LEFT)
+        self.add_sep_1.pack(side=LEFT)
+        self.add_octet_2.pack(side=LEFT)
+        self.add_sep_2.pack(side=LEFT)
+        self.add_octet_3.pack(side=LEFT)
+        self.add_sep_3.pack(side=LEFT)
+        self.add_cidr.pack(side=LEFT)
+        self.add_button.grid(row=0, column=2)
+        self.add_info.pack()
 
-        self.add_button = Button(self.add_frame, text="OK", width=3, command=self.get_address)
-        self.add_info = Text(self.add_frame, state=DISABLED, width=55, height=4)
-
+        # Network
         self.net_frame = Frame(self.master)
         self.net_label = Label(self.net_frame, text="Original Network Information")
         self.net_info = Text(self.net_frame, state=DISABLED, width=55, height=6)
 
-        self.net_label.grid(row=0, column=0)
-        self.net_info.grid(row=1, column=0)
+        self.net_label.pack()
+        self.net_info.pack()
 
-        self.custom_frame = Frame(self.master)
-        self.custom_label = Label(self.custom_frame, text="Is a custom subnet mask used?")
-
-        self.custom = BooleanVar()
-        self.custom_yes = Radiobutton(self.custom_frame, state=DISABLED, text="Yes",
-                                      variable=self.custom, value=True, command=self.show_custom_net)
-        self.custom_no = Radiobutton(self.custom_frame, state=DISABLED, text="No",
-                                     variable=self.custom, value=False, command=self.show_custom_net)
-        # self.custom.set(False)
-
-        self.custom_cidr = Frame(self.custom_frame)
-        self.cidr_label = Label(self.custom_cidr, text="Enter custom CIDR:")
+        # Custom
+        custom_used = BooleanVar()
+        custom_used.set(False)
+        self.cus_frame = Frame(self.master)
+        self.cus_label = Label(self.cus_frame, text="Enter custom CIDR:")
         new_cidr = StringVar()
-        self.cidr_entry = ValidatingEntry(self.custom_cidr, state=DISABLED, width=2, textvariable=new_cidr)
-        self.cidr_entry.limit = 32
+        self.cus_entry = ValidatingEntry(self.cus_frame, state=DISABLED, width=2, textvariable=new_cidr)
+        self.cus_entry.limit = 32
+        self.cus_button = Checkbutton(self.cus_frame, text="Allow Custom", variable=custom_used,
+                                      command=self.enable_custom_cidr(custom_used))
 
-        self.error_display = Text(self.master, width=55, height=2)
-        sys.stderr = OutputRedirector(self.error_display)
+        self.cus_button.pack(side=LEFT)
+        self.cus_label.pack(side=LEFT, padx=5)
+        self.cus_entry.pack(side=LEFT)
 
-        self.add_label.grid(row=0, column=0, padx=5)
-        self.add_octets.grid(row=0, column=1)
-        # Contents of self.add_octets - start
-        self.octet_0.pack(side=LEFT)
-        self.octet_sep_0.pack(side=LEFT)
-        self.octet_1.pack(side=LEFT)
-        self.octet_sep_1.pack(side=LEFT)
-        self.octet_2.pack(side=LEFT)
-        self.octet_sep_2.pack(side=LEFT)
-        self.octet_3.pack(side=LEFT)
-        self.octet_sep_3.pack(side=LEFT)
-        self.octet_cidr.pack(side=LEFT)
-        # Contents of self.add_octets - end
-        self.add_button.grid(row=0, column=2, padx=5)
-        self.add_info.grid(row=1, column=0, columnspan=3)
+        # Debug Console
+        self.err_frame = Frame(self.master)
+        self.err_label = Label(self.err_frame, text="Debug Console:")
 
-        self.custom_label.grid(row=0, column=0)
-        self.custom_yes.grid(row=0, column=1)
-        self.custom_no.grid(row=0, column=2)
-        self.custom_cidr.grid(row=2, column=0)
-        # Contents of self.custom_cidr - start
-        self.cidr_label.pack(side=LEFT)
-        self.cidr_entry.pack(side=LEFT)
+        self.err_display = Text(self.err_frame, width=55, height=2)
+        sys.stderr = OutputRedirector(self.err_display)
 
+        self.err_label.pack()
+        self.err_display.pack()
+
+        # Subnets
         self.sub_frame = Frame(self.master)
+        self.sub_label = Label(self.sub_frame, text="Subnet List")
 
+        self.sub_label.pack()
+
+        self.master.pack()
         self.add_frame.grid(row=0, column=0)
         self.net_frame.grid(row=1, column=0)
-        self.custom_frame.grid(row=2, column=0)
-        self.error_display.grid(row=3, column=0)
-        self.sub_frame.grid(row=0, column=1)
-        self.master.grid(row=0, column=0)
+        self.cus_frame.grid(row=2, column=0)
+        self.err_frame.grid(row=3, column=0)
+        self.sub_frame.grid(row=0, column=1, rowspan=4)
 
     def get_address(self):
-        full_ip = self.octet_0.get() + "." + self.octet_1.get() + "." + self.octet_2.get() + "." + self.octet_3.get()
-        self.address = Address(full_ip, self.octet_cidr.get())
+        full_ip = self.add_octet_0.get() + "." + self.add_octet_1.get() + "." + \
+                  self.add_octet_2.get() + "." + self.add_octet_3.get()
+        self.address = Address(full_ip, self.add_cidr.get())
 
         self.display_info(self.add_info)
 
         self.get_original_network()
-        self.enable_custom_frame()
 
     def get_original_network(self):
         net_address = str(self.address.address) + "/" + self.address.cidr
@@ -129,12 +131,14 @@ class AddressFrame(Frame):
     def get_subnet_list(self):
         pass
 
-    def enable_custom_frame(self):
-        self.custom_yes.config(state=NORMAL)
-        self.custom_no.config(state=NORMAL)
+    def enable_custom_cidr(self, flag):
+        if flag:
+            self.cus_entry.config(state=NORMAL)
+        else:
+            self.cus_entry.config(state=DISABLED)
 
     def show_custom_net(self):
-        if self.custom.get():
+        if self.custom_used.get():
             self.custom_cidr.grid(row=4, column=0)
         else:
             self.custom_cidr.grid_remove()
