@@ -3,11 +3,19 @@ Stergios Mekras
 eaasmek@students.eaaa.dk
 """
 
+# Left here for future GTK port
+# import gi
+# gi.require_version("Gtk", "3.0")
+# from gi.repository import Gtk
+
+from ttkthemes import themed_tk as tk
+
 from gui.custom import *
+from logic.address import *
 from logic.network import *
 
 
-class AddressFrame(Frame):
+class SubnetCalc(object):
     address = None
     network = None
     subnet = None
@@ -76,36 +84,50 @@ class AddressFrame(Frame):
         self.net_info.pack()
 
         # Custom
-        custom_used = BooleanVar()
-        custom_used.set(False)
+        self.custom_used = False
         self.cus_frame = Frame(self.master)
-        self.cus_label = Label(self.cus_frame, text="Enter custom CIDR:")
-        new_cidr = StringVar()
-        self.cus_entry = ValidatingEntry(self.cus_frame, state=DISABLED, width=2, textvariable=new_cidr)
-        self.cus_entry.limit = 32
-        self.cus_button = Checkbutton(self.cus_frame, text="Allow Custom", variable=custom_used,
-                                      command=self.enable_custom_cidr(custom_used))
+        self.cus_banner = Frame(self.cus_frame)
+        self.cus_cidr = Frame(self.cus_banner)
+        self.cus_show = Frame(self.cus_frame)
+        self.cus_sep_0 = Separator(self.cus_frame, orient=HORIZONTAL)
 
-        self.cus_button.pack(side=LEFT)
-        self.cus_label.pack(side=LEFT, padx=5)
+        self.cus_check = Checkbutton(self.cus_banner, text="Allow Custom", variable=self.custom_used,
+                                     command=self.enable_custom_cidr())
+        self.cus_input = Label(self.cus_cidr, text="Enter custom CIDR:")
+        self.new_cidr = StringVar()
+        self.cus_entry = ValidatingEntry(self.cus_cidr, state=DISABLED, width=2, textvariable=self.new_cidr)
+        self.cus_entry.limit = 32
+        self.cus_button = Button(self.cus_frame, text="Subnet List >>")
+
+        self.cus_banner.pack()
+        self.cus_check.pack(side=LEFT)
+        self.cus_sep_0.pack()
+        self.cus_cidr.pack(side=LEFT)
+        self.cus_input.pack(side=LEFT)
         self.cus_entry.pack(side=LEFT)
+        self.cus_show.pack()
+        self.cus_button.pack(side=RIGHT)
 
         # Debug Console
         self.err_frame = Frame(self.master)
         self.err_label = Label(self.err_frame, text="Debug Console:")
 
         self.err_display = Text(self.err_frame, width=55, height=2)
-        sys.stderr = OutputRedirector(self.err_display)
+        # sys.stderr = OutputRedirector(self.err_display)
 
         self.err_label.pack()
         self.err_display.pack()
 
         # Subnets
         self.sub_frame = Frame(self.master)
-        self.sub_label = Label(self.sub_frame, text="Subnet List")
+
+        self.sub_label = Label(self.sub_frame, text="Network Subnets")
+        self.sub_list = Listbox(self.sub_frame, width=45, height=16)
 
         self.sub_label.pack()
+        self.sub_list.pack()
 
+        # Assembly
         self.master.pack()
         self.add_frame.grid(row=0, column=0)
         self.net_frame.grid(row=1, column=0)
@@ -131,17 +153,12 @@ class AddressFrame(Frame):
     def get_subnet_list(self):
         pass
 
-    def enable_custom_cidr(self, flag):
-        if flag:
-            self.cus_entry.config(state=NORMAL)
+    def enable_custom_cidr(self):
+        if self.custom_used:
+            self.cus_cidr.grid(row=1, column=0)
         else:
-            self.cus_entry.config(state=DISABLED)
-
-    def show_custom_net(self):
-        if self.custom_used.get():
-            self.custom_cidr.grid(row=4, column=0)
-        else:
-            self.custom_cidr.grid_remove()
+            self.cus_cidr.grid_forget()
+        print(self.custom_used)
 
     def display_info(self, text_area):
         text_area.delete("1.0", END)
@@ -152,3 +169,12 @@ class AddressFrame(Frame):
         elif text_area is self.net_info:
             self.network.print_network_information()
         text_area.config(state=DISABLED)
+
+
+root = tk.ThemedTk()
+root.title("Subnet Calculator")
+root.set_theme("ubuntu")
+
+app = SubnetCalc()
+
+root.mainloop()

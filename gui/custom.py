@@ -29,12 +29,6 @@ class ValidatingEntry(Entry):
         return True
 
 
-class AddressEntry(Frame):
-
-    def get_address(self):
-        return full_address
-
-
 class OutputRedirector(object):
     def __init__(self, text_widget):
         self.text_space = text_widget
