@@ -73,7 +73,7 @@ class Network(object):
             last_host = self.net[-2]
         return last_host
 
-    def print_network_information(self):
+    def print_information(self):
         print(self.type, "configuration. Proceed accordingly.")
         print("The Subnet Mask is:     ", self.net.netmask)
         print("The Host Mask is:       ", self.net.hostmask)
