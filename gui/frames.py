@@ -3,15 +3,19 @@ Stergios Mekras
 eaasmek@students.eaaa.dk
 """
 
+from tkinter.scrolledtext import *
+
 from gui.custom import *
 from logic.address import *
 from logic.network import *
 
 
 class GenericFrame(Frame):
-    def __init__(self, master, **kw):
+    def __init__(self, app, **kw):
         super().__init__(**kw)
-        self.frame = Frame(master)
+        self.app = app
+        self.parent = app.master
+        self.frame = Frame(self.parent)
         self.label = Label(self.frame, text="")
         self.info = Text(self.frame, state=DISABLED, width=55, height=4)
 
@@ -24,8 +28,8 @@ class GenericFrame(Frame):
 
 
 class AddressFrame(GenericFrame):
-    def __init__(self, master, **kw):
-        super().__init__(master, **kw)
+    def __init__(self, app, **kw):
+        super().__init__(app, **kw)
         self.entry = Frame(self.frame)
         self.octets = Frame(self.entry)
 
@@ -53,7 +57,7 @@ class AddressFrame(GenericFrame):
         octet_entries = [self.octet_entry_0, self.octet_entry_1, self.octet_entry_2, self.octet_entry_3]
         for i in range(len(octet_entries)):
             octet_entries[i].limit = 255
-        self.cidr_entry.limit = 255
+        self.cidr_entry.limit = 32
 
         [octet.set(0) for octet in octets]
         cidr.set(24)
@@ -77,16 +81,14 @@ class AddressFrame(GenericFrame):
         full_ip = self.octet_entry_0.get() + "." + self.octet_entry_1.get() + "." + \
                   self.octet_entry_2.get() + "." + self.octet_entry_3.get()
 
-        self.master.address = Address(full_ip, self.cidr_entry.get())
-
-        self.display_info(self.master.address)
-
-        self.master.net_frame.get_original_network()
+        address = Address(full_ip, self.cidr_entry.get())
+        self.display_info(address)
+        self.app.net_frame.get_original_network(address)
 
 
 class CustomFrame(GenericFrame):
-    def __init__(self, master, **kw):
-        super().__init__(master, **kw)
+    def __init__(self, app, **kw):
+        super().__init__(app, **kw)
         self.label.config(text="Subnet Configuration")
 
         self.custom_used = False
@@ -104,7 +106,7 @@ class CustomFrame(GenericFrame):
         self.banner.pack()
         self.check.pack(side=LEFT)
         self.entry.pack(side=LEFT, padx=5)
-        self.button.pack(side=LEFT)
+        self.button.pack(side=RIGHT)
 
     def enable_custom_cidr(self):
         if self.custom_used is not False:
@@ -113,12 +115,18 @@ class CustomFrame(GenericFrame):
             self.entry.config(state=DISABLED)
 
     def show_subnet_list(self):
-        self.master.sub_frame.grid(row=0, column=1, rowspan=4)
+        visible = False
+        if visible:
+            self.app.sub_frame.grid_remove()
+        else:
+            self.app.sub_frame.grid(row=0, column=1, rowspan=4)
 
 
 class DebugFrame(GenericFrame):
-    def __init__(self, master, **kw):
-        super().__init__(master, **kw)
+    def __init__(self, app, **kw):
+        super().__init__(app, **kw)
+        self.info = ScrolledText(self.frame, state=DISABLED, width=53, height=4)
+
         self.label.config(text="Debug Console:")
         self.info.config(state=NORMAL, height=2)
         sys.stderr = OutputRedirector(self.info)
@@ -128,20 +136,20 @@ class DebugFrame(GenericFrame):
 
 
 class NetworkFrame(GenericFrame):
-    def __init__(self, master, **kw):
-        super().__init__(master, **kw)
+    def __init__(self, app, **kw):
+        super().__init__(app, **kw)
         self.label.config(text="Original Network Information")
         self.info.config(height=6)
 
         self.label.pack()
         self.info.pack()
 
-    def get_original_network(self):
-        net_address = str(self.master.address.address) + "/" + self.master.address.cidr
-        self.master.network = Network(net_address)
-        self.master.subnet_list = self.get_subnet_list()
+    def get_original_network(self, address):
+        net_address = str(address.address) + "/" + address.cidr
+        address.network = Network(net_address)
+        # self.master.subnet_list = self.get_subnet_list()
 
-        self.display_info(self.master.network)
+        self.display_info(address.network)
 
     def get_subnet_list(self):
         new_cidr = self.master.new_cidr

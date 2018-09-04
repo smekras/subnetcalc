@@ -14,7 +14,6 @@ from gui.frames import *
 
 
 class SubnetCalc(object):
-    network = None
     subnet_list = []
 
     def __init__(self, **kw):
@@ -22,19 +21,19 @@ class SubnetCalc(object):
         self.master = Frame()
 
         # Address
-        self.add_frame = AddressFrame(self.master)
+        self.add_frame = AddressFrame(self)
 
         # Network
-        self.net_frame = NetworkFrame(self.master)
+        self.net_frame = NetworkFrame(self)
 
         # Custom
-        self.cus_frame = CustomFrame(self.master)
+        self.cus_frame = CustomFrame(self)
 
         # Debug Console
-        self.err_frame = DebugFrame(self.master)
+        self.err_frame = DebugFrame(self)
 
         # Subnets
-        self.sub_frame = SubnetFrame(self.master)
+        self.sub_frame = SubnetFrame(self)
 
         # Assembly
         self.master.pack()
@@ -46,6 +45,7 @@ class SubnetCalc(object):
 
 root = tk.ThemedTk()
 root.title("Subnet Calculator")
+root.resizable(False, False)
 root.set_theme("ubuntu")
 
 app = SubnetCalc()
