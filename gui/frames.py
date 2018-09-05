@@ -118,8 +118,10 @@ class CustomFrame(GenericFrame):
         visible = False
         if visible:
             self.app.sub_frame.grid_remove()
+            visible = False
         else:
             self.app.sub_frame.grid(row=0, column=1, rowspan=4)
+            visible = True
 
 
 class DebugFrame(GenericFrame):

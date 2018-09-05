@@ -1,3 +1,8 @@
+"""
+Stergios Mekras
+eaasmek@students.eaaa.dk
+"""
+
 from tkinter import *
 from tkinter.ttk import *
 

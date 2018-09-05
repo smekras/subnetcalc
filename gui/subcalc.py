@@ -14,8 +14,6 @@ from gui.frames import *
 
 
 class SubnetCalc(object):
-    subnet_list = []
-
     def __init__(self, **kw):
         super().__init__(**kw)
         self.master = Frame()
