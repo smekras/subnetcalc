@@ -2,6 +2,7 @@
 Just a simple subnet calculator.
 
 ## Files
+- cli/subnet.py: The original program
 - gui/custom.py
 - gui/frames.py
 - gui/subcalc.py: The main interface
@@ -11,7 +12,8 @@ Just a simple subnet calculator.
 - README.md: This file
 
 ### TODO
-- [x] Clean up code - Phase 1
-- [ ] Clean up code - Phase 2
-- [ ] Show subnet list
-- [ ] Show subnet information
+- [x] Clean up code
+- [ ] Add comments
+- [x] Show subnet list
+- [ ] Hide subnet list
+- [X] Show subnet information

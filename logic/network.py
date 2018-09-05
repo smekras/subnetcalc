@@ -46,7 +46,7 @@ class Network(object):
                 parent = address + "/8"
 
             if int(cidr) == 24 or int(cidr) == 16 or int(cidr) == 8:
-                subnet_list = [address]
+                subnet_list = [self.net]
             else:
                 subnet_list = list(ip.ip_network(parent, strict=False).subnets(new_prefix=int(cidr)))
         self.subnet_list = subnet_list  # Needed for subsequent calls

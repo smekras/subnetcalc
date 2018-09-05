@@ -134,7 +134,7 @@ class DebugFrame(GenericFrame):
         self.label.config(text="Debug Console:")
         self.info.config(state=NORMAL, height=2)
 
-        # sys.stderr = OutputRedirector(self.info)
+        sys.stderr = OutputRedirector(self.info)
 
         self.label.pack()
         self.info.pack()
@@ -144,7 +144,20 @@ class SubnetFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
         self.label.config(text="Network Subnets")
-        self.sub_list = Treeview(self.frame)
+        # self.sub_list = Treeview(self.frame, columns=("Network", "First Host", "Last Host", "Broadcast"))
+        self.sub_list = Treeview(self.frame, columns=["", "", "", ""])
+        self.sub_list.configure(height=14)
+        self.sub_list.heading("#0", text="Subnet")
+        self.sub_list.heading("#1", text="Network IP")
+        self.sub_list.heading("#2", text="First Host")
+        self.sub_list.heading("#3", text="Last Host")
+        self.sub_list.heading("#4", text="Broadcast IP")
+        self.sub_list.column("#0", width=70, stretch=0)
+        self.sub_list.column("#1", width=140, stretch=0)
+        self.sub_list.column("#2", width=140, stretch=0)
+        self.sub_list.column("#3", width=140, stretch=0)
+        self.sub_list.column("#4", width=140, stretch=0)
+        self.sub_view = self.sub_list
 
         self.label.pack()
         self.sub_list.pack()
