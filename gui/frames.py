@@ -7,11 +7,10 @@ from tkinter.scrolledtext import *
 
 from gui.custom import *
 from logic.address import *
-from logic.network import *
 
 
 class GenericFrame(Frame):
-    def __init__(self, app, **kw):
+    def __init__(self, app=None, **kw):
         super().__init__(**kw)
         self.app = app
         self.parent = app.master
@@ -39,7 +38,7 @@ class AddressFrame(GenericFrame):
         self.sep_2 = Label(self.octets, text=".")
         self.sep_3 = Label(self.octets, text="/")
 
-        self.button = Button(self.entry, text="OK", width=3, command=self.get_address)
+        self.button = Button(self.entry, text="OK", width=3, command=self.app.get_address)
 
         octet_0 = StringVar()
         octet_1 = StringVar()
@@ -82,8 +81,17 @@ class AddressFrame(GenericFrame):
                   self.octet_entry_2.get() + "." + self.octet_entry_3.get()
 
         address = Address(full_ip, self.cidr_entry.get())
-        self.display_info(address)
-        self.app.net_frame.get_original_network(address)
+        return address
+
+
+class NetworkFrame(GenericFrame):
+    def __init__(self, app, **kw):
+        super().__init__(app, **kw)
+        self.label.config(text="Original Network Information")
+        self.info.config(height=6)
+
+        self.label.pack()
+        self.info.pack()
 
 
 class CustomFrame(GenericFrame):
@@ -91,16 +99,19 @@ class CustomFrame(GenericFrame):
         super().__init__(app, **kw)
         self.label.config(text="Subnet Configuration")
 
-        self.custom_used = False
-        self.banner = Frame(self.frame)
-
+        self.custom_used = BooleanVar()
         self.new_cidr = IntVar()
+
+        self.banner = Frame(self.frame)
         self.entry = ValidatingEntry(self.banner, state=DISABLED, width=2, textvariable=self.new_cidr)
         self.entry.limit = 32
+
+        self.custom_used = False
         self.new_cidr = 0
+
         self.check = Checkbutton(self.banner, text="Allow Custom CIDR:", variable=self.custom_used,
                                  command=self.enable_custom_cidr())
-        self.button = Button(self.banner, text="Subnet List >>", command=self.show_subnet_list)
+        self.button = Button(self.banner, state=DISABLED, text="Subnet List >>", command=self.app.show_subnet_list)
 
         self.label.pack()
         self.banner.pack()
@@ -114,15 +125,6 @@ class CustomFrame(GenericFrame):
         else:
             self.entry.config(state=DISABLED)
 
-    def show_subnet_list(self):
-        visible = False
-        if visible:
-            self.app.sub_frame.grid_remove()
-            visible = False
-        else:
-            self.app.sub_frame.grid(row=0, column=1, rowspan=4)
-            visible = True
-
 
 class DebugFrame(GenericFrame):
     def __init__(self, app, **kw):
@@ -131,50 +133,18 @@ class DebugFrame(GenericFrame):
 
         self.label.config(text="Debug Console:")
         self.info.config(state=NORMAL, height=2)
-        sys.stderr = OutputRedirector(self.info)
+
+        # sys.stderr = OutputRedirector(self.info)
 
         self.label.pack()
         self.info.pack()
-
-
-class NetworkFrame(GenericFrame):
-    def __init__(self, app, **kw):
-        super().__init__(app, **kw)
-        self.label.config(text="Original Network Information")
-        self.info.config(height=6)
-
-        self.label.pack()
-        self.info.pack()
-
-    def get_original_network(self, address):
-        net_address = str(address.address) + "/" + address.cidr
-        address.network = Network(net_address)
-        # self.master.subnet_list = self.get_subnet_list()
-
-        self.display_info(address.network)
-
-    def get_subnet_list(self):
-        new_cidr = self.master.new_cidr
-        if self.master.network is not None:
-            if new_cidr != "0":
-                subnets = self.master.network.get_subnet_list(new_cidr)
-            else:
-                subnets = self.master.network.get_subnet_list()
-            print(subnets)
-        else:
-            subnets = []
-        return subnets
 
 
 class SubnetFrame(GenericFrame):
-    def __init__(self, master, **kw):
-        super().__init__(master, **kw)
+    def __init__(self, app, **kw):
+        super().__init__(app, **kw)
         self.label.config(text="Network Subnets")
-        self.listbox = Listbox(self.frame, width=45, height=16)
+        self.sub_list = Treeview(self.frame)
 
         self.label.pack()
-        self.listbox.pack()
-
-    def fill_list(self, subnet_list):
-        for item in subnet_list:
-            self.listbox.insert(END, item)
+        self.sub_list.pack()

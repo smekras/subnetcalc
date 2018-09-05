@@ -22,7 +22,7 @@ class Network(object):
         subnet.print_subnet_information()
 
     def get_subnet_type(self):
-        if len(list(self.net)) <= 2:
+        if len(list(self.net.hosts())) <= 2:
             subnet_type = "Special"
         else:
             subnet_type = "Standard"
@@ -53,10 +53,7 @@ class Network(object):
         return subnet_list
 
     def get_host_number(self):
-        if len(self.host_list) <= 2:
-            host_number = len(self.host_list)
-        else:
-            host_number = len(self.host_list) - 2
+        host_number = len(self.host_list)
         return host_number
 
     def get_host_first(self):
