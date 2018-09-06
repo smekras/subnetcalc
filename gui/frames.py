@@ -29,16 +29,15 @@ class GenericFrame(Frame):
 class AddressFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
-        self.entry = Frame(self.frame)
-        self.octets = Frame(self.entry)
+        self.label.configure(text="Address Configuration")
+        self.banner = Frame(self.frame)
+        self.octets = Frame(self.banner)
 
-        self.label = Label(self.entry, text="Enter IP Address:")
+        self.prompt = Label(self.banner, text="IP Address:")
         self.sep_0 = Label(self.octets, text=".")
         self.sep_1 = Label(self.octets, text=".")
         self.sep_2 = Label(self.octets, text=".")
         self.sep_3 = Label(self.octets, text="/")
-
-        self.button = Button(self.entry, text="OK", width=3, command=self.app.get_address)
 
         octet_0 = StringVar()
         octet_1 = StringVar()
@@ -51,7 +50,7 @@ class AddressFrame(GenericFrame):
         self.octet_entry_1 = ValidatingEntry(self.octets, width=3, textvariable=octet_1)
         self.octet_entry_2 = ValidatingEntry(self.octets, width=3, textvariable=octet_2)
         self.octet_entry_3 = ValidatingEntry(self.octets, width=3, textvariable=octet_3)
-        self.cidr_entry = ValidatingEntry(self.octets, width=2, textvariable=cidr)
+        self.cidr_entry = ValidatingEntry(self.banner, width=2, textvariable=cidr)
 
         octet_entries = [self.octet_entry_0, self.octet_entry_1, self.octet_entry_2, self.octet_entry_3]
         for i in range(len(octet_entries)):
@@ -61,20 +60,39 @@ class AddressFrame(GenericFrame):
         [octet.set(0) for octet in octets]
         cidr.set(24)
 
-        self.entry.pack()
+        self.custom_used = StringVar()
+        self.new_cidr = IntVar()
+
+        self.entry = ValidatingEntry(self.banner, state=DISABLED, width=2, textvariable=self.new_cidr)
+        self.entry.limit = 32
+
+        self.check = Checkbutton(self.banner, text="Allow Custom CIDR:", variable=self.custom_used,
+                                 command=self.enable_custom_cidr)
+
+        self.button = Button(self.banner, text="OK", width=3, command=self.app.get_address)
+
+        self.custom_used = "False"
+        self.new_cidr = 0
+
         self.label.grid(row=0, column=0)
+        self.banner.grid(row=1, column=0)
+        self.info.grid(row=2, column=0)
+
+        self.prompt.grid(row=0, column=0)
         self.octets.grid(row=0, column=1, padx=5)
-        self.octet_entry_0.pack(side=LEFT)
-        self.sep_0.pack(side=LEFT)
-        self.octet_entry_1.pack(side=LEFT)
-        self.sep_1.pack(side=LEFT)
-        self.octet_entry_2.pack(side=LEFT)
-        self.sep_2.pack(side=LEFT)
-        self.octet_entry_3.pack(side=LEFT)
-        self.sep_3.pack(side=LEFT)
-        self.cidr_entry.pack(side=LEFT)
-        self.button.grid(row=0, column=2)
-        self.info.pack()
+        self.cidr_entry.grid(row=0, column=2)
+        self.check.grid(row=1, column=0, columnspan=2, sticky='e')
+        self.entry.grid(row=1, column=2, padx=5)
+        self.button.grid(row=1, column=3)
+
+        self.octet_entry_0.grid(row=0, column=0)
+        self.sep_0.grid(row=0, column=1)
+        self.octet_entry_1.grid(row=0, column=2)
+        self.sep_1.grid(row=0, column=3)
+        self.octet_entry_2.grid(row=0, column=4)
+        self.sep_2.grid(row=0, column=5)
+        self.octet_entry_3.grid(row=0, column=6)
+        self.sep_3.grid(row=0, column=7)
 
     def get_address(self):
         full_ip = self.octet_entry_0.get() + "." + self.octet_entry_1.get() + "." + \
@@ -82,6 +100,14 @@ class AddressFrame(GenericFrame):
 
         address = Address(full_ip, self.cidr_entry.get())
         return address
+
+    def enable_custom_cidr(self):
+        if self.custom_used != "False":
+            self.entry.config(state='NORMAL')
+            self.custom_used = "True"
+        else:
+            self.entry.config(state='DISABLED')
+            self.custom_used = "False"
 
 
 class NetworkFrame(GenericFrame):
@@ -97,49 +123,23 @@ class NetworkFrame(GenericFrame):
 class CustomFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
-        self.label.config(text="Subnet Configuration")
-
-        self.custom_used = StringVar()
-        self.new_cidr = IntVar()
-
-        self.banner = Frame(self.frame)
-        self.entry = ValidatingEntry(self.banner, state=DISABLED, width=2, textvariable=self.new_cidr)
-        self.entry.limit = 32
-
-        self.custom_used = "False"
-        self.new_cidr = 0
-
-        self.check = Checkbutton(self.banner, text="Allow Custom CIDR:", variable=self.custom_used,
-                                 command=self.enable_custom_cidr)
-        self.button = Button(self.banner, state=DISABLED, text="Subnet List >>", command=self.app.show_subnet_list)
-
-        self.label.pack()
-        self.banner.pack()
-        self.check.pack(side=LEFT)
-        self.entry.pack(side=LEFT, padx=5)
-        self.button.pack(side=RIGHT)
-
-    def enable_custom_cidr(self):
-        if self.custom_used != "False":
-            self.entry.config(state='NORMAL')
-            self.custom_used = "True"
-        else:
-            self.entry.config(state='DISABLED')
-            self.custom_used = "False"
 
 
 class DebugFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
-        self.info = ScrolledText(self.frame, state=DISABLED, width=53, height=4)
+        self.info = ScrolledText(self.frame, state=DISABLED, width=30, height=10)
 
         self.label.config(text="Debug Console:")
         self.info.config(state=NORMAL, height=2)
 
+        self.button = Button(self.frame, state=DISABLED, text="Subnet List >>", command=self.app.show_subnet_list)
+
         sys.stderr = OutputRedirector(self.info)
 
-        self.label.pack()
-        self.info.pack()
+        self.label.grid(row=0, column=0)
+        self.button.grid(row=0, column=1, rowspan=2, padx=5)
+        self.info.grid(row=1, column=0)
 
 
 class SubnetFrame(GenericFrame):
@@ -159,6 +159,8 @@ class SubnetFrame(GenericFrame):
         self.sub_list.column("#3", width=140, stretch=0)
         self.sub_list.column("#4", width=140, stretch=0)
         self.sub_view = self.sub_list
+        self.scroll = Scrollbar(self.frame, orient="vertical", command=self.sub_list.yview)
 
         self.label.pack()
-        self.sub_list.pack()
+        self.sub_list.pack(side='left')
+        self.scroll.pack(side='right', fill='y')

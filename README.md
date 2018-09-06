@@ -13,8 +13,8 @@ Just a simple subnet calculator.
 
 ### TODO
 - [x] Clean up code
-- [ ] Add comments
+- [x] Add comments - WIP
 - [x] Show/hide subnet list
-- [x] Calculate custom subnets
+- [x] Calculate custom subnets - WIP
 - [ ] Display correct subnet info
 - [X] Show subnet information

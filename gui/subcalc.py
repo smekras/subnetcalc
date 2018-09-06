@@ -39,15 +39,17 @@ class SubnetCalc(object):
 
     def get_address(self):
         self.address = self.add_frame.get_address()
-        self.add_frame.display_info(self.address)
         self.network = Network(str(self.address.address) + "/" + self.address.cidr)
+        self.add_frame.display_info(self.address)
         self.net_frame.display_info(self.network)
         self.cus_frame.button.config(state=NORMAL)
-        if self.cus_frame.entry.get() != "":
+        if self.cus_frame.entry.get() != "" or self.cus_frame.custom_used != "False":
             self.cus_frame.new_cidr = int(self.cus_frame.entry.get())
             self.subnets = self.network.get_subnet_list(self.cus_frame.new_cidr)
         else:
             self.subnets = self.network.subnet_list
+        sys.stdout = OutputRedirector(self.err_frame.info)
+        print(self.cus_frame.entry.get(), self.cus_frame.custom_used)
         self.fill_subnet_list()
 
     def show_subnet_list(self):
