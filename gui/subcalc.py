@@ -21,6 +21,7 @@ class SubnetCalc(object):
         self.address = None
         self.network = None
         self.subnets = None
+        self.expanded = False
 
         # Frames
         self.add_frame = AddressFrame(self)
@@ -46,13 +47,14 @@ class SubnetCalc(object):
         self.fill_subnet_list()
 
     def show_subnet_list(self):
-        self.visible = False
-        if self.visible:
+        if self.expanded:
             self.sub_frame.frame.grid_remove()
-            self.visible = False
+            self.cus_frame.button.configure(text="Subnet List >>")
+            self.expanded = False
         else:
             self.sub_frame.frame.grid(row=0, column=1, rowspan=4)
-            self.visible = True
+            self.cus_frame.button.configure(text="Subnet List <<")
+            self.expanded = True
         if self.cus_frame.new_cidr != 0:
             self.subnets = self.network.get_subnet_list(self.cus_frame.entry.get())
 
@@ -67,7 +69,7 @@ class SubnetCalc(object):
                     subnet_ips = [subnet[0], subnet[0], subnet[-1], subnet[-1]]
                 else:
                     subnet_ips = [subnet[0], subnet[1], subnet[-2], subnet[-1]]
-                self.sub_frame.sub_view.insert('', 'end', text="#" + str(i),
+                self.sub_frame.sub_view.insert("", "end", text="#" + str(i),
                                                values=(subnet_ips[0], subnet_ips[1], subnet_ips[2], subnet_ips[3]))
 
 

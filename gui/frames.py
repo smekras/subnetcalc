@@ -144,7 +144,6 @@ class SubnetFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
         self.label.config(text="Network Subnets")
-        # self.sub_list = Treeview(self.frame, columns=("Network", "First Host", "Last Host", "Broadcast"))
         self.sub_list = Treeview(self.frame, columns=["", "", "", ""])
         self.sub_list.configure(height=14)
         self.sub_list.heading("#0", text="Subnet")

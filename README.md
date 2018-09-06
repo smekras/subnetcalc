@@ -15,5 +15,5 @@ Just a simple subnet calculator.
 - [x] Clean up code
 - [ ] Add comments
 - [x] Show subnet list
-- [ ] Hide subnet list
+- [x] Hide subnet list
 - [X] Show subnet information

@@ -12,8 +12,8 @@ class ValidatingEntry(Entry):
     def __init__(self, *args, **kwargs):
         Entry.__init__(self, *args, **kwargs)
 
-        vcmd = (self.register(self.on_validate), '%P')
-        self.configure(validate='key', validatecommand=vcmd)
+        vcmd = (self.register(self.on_validate), "%P")
+        self.configure(validate="key", validatecommand=vcmd)
         self.limit = 0
 
     def disallow(self):
@@ -39,5 +39,5 @@ class OutputRedirector(object):
         self.text_space = text_widget
 
     def write(self, string):
-        self.text_space.insert('end', string)
-        self.text_space.see('end')
+        self.text_space.insert("end", string)
+        self.text_space.see("end")
