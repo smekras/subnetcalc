@@ -99,18 +99,18 @@ class CustomFrame(GenericFrame):
         super().__init__(app, **kw)
         self.label.config(text="Subnet Configuration")
 
-        self.custom_used = BooleanVar()
+        self.custom_used = StringVar()
         self.new_cidr = IntVar()
 
         self.banner = Frame(self.frame)
         self.entry = ValidatingEntry(self.banner, state=DISABLED, width=2, textvariable=self.new_cidr)
         self.entry.limit = 32
 
-        self.custom_used = False
+        self.custom_used = "False"
         self.new_cidr = 0
 
         self.check = Checkbutton(self.banner, text="Allow Custom CIDR:", variable=self.custom_used,
-                                 command=self.enable_custom_cidr())
+                                 command=self.enable_custom_cidr)
         self.button = Button(self.banner, state=DISABLED, text="Subnet List >>", command=self.app.show_subnet_list)
 
         self.label.pack()
@@ -120,10 +120,12 @@ class CustomFrame(GenericFrame):
         self.button.pack(side=RIGHT)
 
     def enable_custom_cidr(self):
-        if self.custom_used is not False:
-            self.entry.config(state=NORMAL)
+        if self.custom_used != "False":
+            self.entry.config(state='NORMAL')
+            self.custom_used = "True"
         else:
-            self.entry.config(state=DISABLED)
+            self.entry.config(state='DISABLED')
+            self.custom_used = "False"
 
 
 class DebugFrame(GenericFrame):

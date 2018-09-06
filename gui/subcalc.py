@@ -43,7 +43,11 @@ class SubnetCalc(object):
         self.network = Network(str(self.address.address) + "/" + self.address.cidr)
         self.net_frame.display_info(self.network)
         self.cus_frame.button.config(state=NORMAL)
-        self.subnets = self.network.subnet_list
+        if self.cus_frame.entry.get() != "":
+            self.cus_frame.new_cidr = int(self.cus_frame.entry.get())
+            self.subnets = self.network.get_subnet_list(self.cus_frame.new_cidr)
+        else:
+            self.subnets = self.network.subnet_list
         self.fill_subnet_list()
 
     def show_subnet_list(self):
@@ -55,8 +59,6 @@ class SubnetCalc(object):
             self.sub_frame.frame.grid(row=0, column=1, rowspan=4)
             self.cus_frame.button.configure(text="Subnet List <<")
             self.expanded = True
-        if self.cus_frame.new_cidr != 0:
-            self.subnets = self.network.get_subnet_list(self.cus_frame.entry.get())
 
     def fill_subnet_list(self):
         self.sub_frame.sub_list.delete(*self.sub_frame.sub_list.get_children())
