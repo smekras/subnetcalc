@@ -88,4 +88,5 @@ root.set_theme("ubuntu")
 
 app = SubnetCalc()
 
+root.eval('tk::PlaceWindow %s center' % root.winfo_pathname(root.winfo_id()))
 root.mainloop()
