@@ -16,20 +16,24 @@ class GenericFrame(Frame):
         self.parent = app.master
         self.frame = Frame(self.parent)
         self.label = Label(self.frame, text="")
-        self.info = Text(self.frame, state=DISABLED, width=55, height=4)
+        self.info = Text(self.frame, state=DISABLED, width=48, height=6)
 
     def display_info(self, source):
-        self.info.delete("1.0", END)
-        sys.stdout = OutputRedirector(self.info)
+        self.clear_info()
         self.info.config(state=NORMAL)
+        sys.stdout = OutputRedirector(self.info)
         source.print_information()
         self.info.config(state=DISABLED)
 
+    def clear_info(self):
+        self.info.config(state=NORMAL)
+        self.info.delete('1.0', END)
+        self.info.config(state=DISABLED)
 
-class AddressFrame(GenericFrame):
+
+class ControlFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
-        self.label.configure(text="Address Configuration")
         self.banner = Frame(self.frame)
         self.octets = Frame(self.banner)
 
@@ -69,20 +73,21 @@ class AddressFrame(GenericFrame):
         self.check = Checkbutton(self.banner, text="Allow Custom CIDR:", variable=self.custom_used,
                                  command=self.enable_custom_cidr)
 
-        self.button = Button(self.banner, text="OK", width=3, command=self.app.get_address)
+        self.button_0 = Button(self.frame, text="OK", width=3, command=self.app.get_address)
+        self.button_1 = Button(self.frame, text="Show Subnet List", width=15, command=self.app.show_subnet_list,
+                               state=DISABLED)
 
         self.new_cidr = 0
 
-        self.label.grid(row=0, column=0)
-        self.banner.grid(row=1, column=0)
-        self.info.grid(row=2, column=0)
+        self.banner.grid(row=0, column=0, pady=10)
+        self.button_0.grid(row=0, column=1, padx=5)
+        self.button_1.grid(row=0, column=2, padx=5)
 
         self.prompt.grid(row=0, column=0)
         self.octets.grid(row=0, column=1, padx=5)
         self.cidr_entry.grid(row=0, column=2)
         self.check.grid(row=1, column=0, columnspan=2, sticky='e')
         self.entry.grid(row=1, column=2, padx=5)
-        self.button.grid(row=1, column=3)
 
         self.octet_entry_0.grid(row=0, column=0)
         self.sep_0.grid(row=0, column=1)
@@ -107,65 +112,78 @@ class AddressFrame(GenericFrame):
             self.entry.config(state='DISABLED')
 
 
+class AddressFrame(GenericFrame):
+    def __init__(self, app, **kw):
+        super().__init__(app, **kw)
+        self.label.configure(text="Address Information")
+        self.info.config(height=4)
+
+        self.label.pack()
+        self.info.pack()
+
+
 class NetworkFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
         self.label.config(text="Original Network Information")
-        self.info.config(height=6)
-
-        self.button = Button(self.frame, state=DISABLED, text="Subnet List >>", command=self.app.show_subnet_list)
 
         self.label.pack()
         self.info.pack()
-        self.button.pack()
 
 
-class SubnetFrame(GenericFrame):
+class CustomFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
-        self.label.config(text="Subnet Information")
-        self.info.config(height=6)
+        self.label.config(text="Custom Network Information")
 
         self.label.pack()
         self.info.pack()
+
+    def display_info(self, **kwargs):
+        self.clear_info()
+        self.info.config(state=NORMAL)
+        sys.stdout = OutputRedirector(self.info)
+        net = self.app.subnets[0]
+        print("Custom configuration. Proceed accordingly.")
+        print("The Subnet Mask is:     ", net.netmask)
+        print("The Host Mask is:       ", net.hostmask)
+        print("Subnets per network:    ", len(self.app.subnets))
+        print("Valid Hosts per subnet: ", net.host_number)
+        self.info.config(state=DISABLED)
 
 
 class DebugFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
-        self.info = ScrolledText(self.frame, state=NORMAL, height=4)
+        self.info = ScrolledText(self.frame, state=NORMAL, width=46, height=4)
 
         self.label.config(text="Debug Console:")
 
         sys.stderr = OutputRedirector(self.info)
 
         self.label.pack()
-        self.info.pack(fill='x')
+        self.info.pack()
 
 
-class ListFrame(GenericFrame):
+class SubnetFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
         self.label.config(text="Network Subnets")
         self.sub_list = Treeview(self.frame, columns=["", "", "", ""])
-        self.sub_list.configure(height=14)
+        self.sub_list.configure(height=10)
         self.sub_list.heading("#0", text="Subnet")
         self.sub_list.heading("#1", text="Network IP")
         self.sub_list.heading("#2", text="First Host")
         self.sub_list.heading("#3", text="Last Host")
         self.sub_list.heading("#4", text="Broadcast IP")
-        self.sub_list.column("#0", width=70, stretch=0)
-        self.sub_list.column("#1", width=140, stretch=0)
-        self.sub_list.column("#2", width=140, stretch=0)
-        self.sub_list.column("#3", width=140, stretch=0)
-        self.sub_list.column("#4", width=140, stretch=0)
-        self.sub_list.bind("<<TreeViewSelect>>", self.on_subnet_select)
+        self.sub_list.column("#0", width=80, stretch=0)
+        self.sub_list.column("#1", width=150, stretch=0)
+        self.sub_list.column("#2", width=150, stretch=0)
+        self.sub_list.column("#3", width=150, stretch=0)
+        self.sub_list.column("#4", width=150, stretch=0)
         self.sub_view = self.sub_list
         self.scroll = Scrollbar(self.frame, orient="vertical", command=self.sub_list.yview)
 
         self.label.pack()
         self.sub_list.pack(side='left')
         self.scroll.pack(side='right', fill='y')
-
-    def on_subnet_select(self, subnet):
-        print("Stuff to show here", subnet)

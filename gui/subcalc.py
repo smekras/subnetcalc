@@ -24,46 +24,50 @@ class SubnetCalc(object):
         self.expanded = False
 
         # Frames
+        self.con_frame = ControlFrame(self)
         self.add_frame = AddressFrame(self)
         self.net_frame = NetworkFrame(self)
-        self.sub_frame = SubnetFrame(self)
         self.err_frame = DebugFrame(self)
-        self.lis_frame = ListFrame(self)
+        self.cus_frame = CustomFrame(self)
+        self.sub_frame = SubnetFrame(self)
 
         # Assembly
         self.master.pack()
-        self.add_frame.frame.grid(row=0, column=0)
-        self.net_frame.frame.grid(row=0, column=1)
-        self.sub_frame.frame.grid(row=0, column=2)
-        self.err_frame.frame.grid(row=2, column=0, columnspan=3)
+        self.con_frame.frame.grid(row=0, column=0, padx=5, columnspan=2)
+        self.add_frame.frame.grid(row=1, column=0, padx=5)
+        self.net_frame.frame.grid(row=2, column=0, padx=5, pady=5)
+        self.err_frame.frame.grid(row=1, column=1, padx=5)
+        self.cus_frame.frame.grid(row=2, column=1, padx=5, pady=5)
 
     def get_address(self):
-        self.address = self.add_frame.get_address()
+        self.address = self.con_frame.get_address()
         self.network = Network(str(self.address.address) + "/" + self.address.cidr)
         self.add_frame.display_info(self.address)
+        self.con_frame.button_1.config(state=NORMAL)
         self.net_frame.display_info(self.network)
-        self.net_frame.button.config(state=NORMAL)
-        sys.stdout = OutputRedirector(self.err_frame.info)
-        if self.add_frame.custom_used.get() != 0:
-            if self.add_frame.entry.get():
-                self.add_frame.new_cidr = int(self.add_frame.entry.get())
-                self.subnets = self.network.get_subnet_list(self.add_frame.new_cidr)
+        if self.con_frame.custom_used.get() != 0:
+            if self.con_frame.entry.get():
+                self.con_frame.new_cidr = int(self.con_frame.entry.get())
+                self.subnets = self.network.get_subnet_list(self.con_frame.new_cidr)
+                self.cus_frame.display_info()
         else:
             self.subnets = self.network.subnet_list
+            self.cus_frame.clear_info()
+        sys.stdout = OutputRedirector(self.err_frame.info)
         self.fill_subnet_list()
 
     def show_subnet_list(self):
         if self.expanded:
-            self.lis_frame.frame.grid_remove()
-            self.net_frame.button.configure(text="Subnet List >>")
+            self.sub_frame.frame.grid_remove()
+            self.con_frame.button_1.configure(text="Show Subnet List")
             self.expanded = False
         else:
-            self.lis_frame.frame.grid(row=1, column=0, columnspan=3)
-            self.net_frame.button.configure(text="Subnet List <<")
+            self.sub_frame.frame.grid(row=3, column=0, columnspan=2)
+            self.con_frame.button_1.configure(text="Hide Subnet List")
             self.expanded = True
 
     def fill_subnet_list(self):
-        self.lis_frame.sub_list.delete(*self.lis_frame.sub_list.get_children())
+        self.sub_frame.sub_list.delete(*self.sub_frame.sub_list.get_children())
         if self.subnets is not None:
             for i in range(len(self.subnets)):
                 subnet = self.subnets[i]
@@ -73,7 +77,7 @@ class SubnetCalc(object):
                     subnet_ips = [subnet[0], subnet[0], subnet[-1], subnet[-1]]
                 else:
                     subnet_ips = [subnet[0], subnet[1], subnet[-2], subnet[-1]]
-                self.lis_frame.sub_view.insert("", "end", text="#" + str(i),
+                self.sub_frame.sub_view.insert("", "end", text="#" + str(i),
                                                values=(subnet_ips[0], subnet_ips[1], subnet_ips[2], subnet_ips[3]))
 
 

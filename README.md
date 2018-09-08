@@ -12,10 +12,6 @@ Just a simple subnet calculator.
 - README.md: This file
 
 ### TODO
-- [x] Clean up code
+- [ ] Clean up code
 - [ ] Add docstrings
 - [ ] Add comments
-- [x] Show/hide subnet list
-- [x] Calculate custom subnets
-- [ ] Display correct subnet info
-- [X] Show subnet information

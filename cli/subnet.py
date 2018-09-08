@@ -7,7 +7,7 @@ import ipaddress as ip
 
 def address_information(address):
     """
-    Display address information
+    Display address information.
 
     :param address: IPv4Address
     :return: None
