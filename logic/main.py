@@ -10,14 +10,18 @@ from logic.network import *
 def get_address():
     given_address = input("Enter IP address (default CIDR /24): ")
 
-    if '/' in given_address:
-        address, cidr = given_address.split(sep='/')
-    else:
-        address = given_address
-        cidr = "24"
+    try:
+        if '/' in given_address:
+            address, cidr = given_address.split(sep='/')
+        else:
+            address = given_address
+            cidr = "24"
 
-    full_ip = Address(address, cidr)
-    return full_ip
+        full_ip = Address(address, cidr)
+        return full_ip
+    except ValueError:
+        print("Not a valid address.")
+        quit()
 
 
 def get_network(add):
