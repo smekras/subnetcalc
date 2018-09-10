@@ -1,5 +1,7 @@
 """
 Stergios Mekras
+
+stergios.mekras@gmail.com
 eaasmek@students.eaaa.dk
 """
 import ipaddress as ip
@@ -33,10 +35,14 @@ def network_information(net):
     :return: None
     """
     if len(list(net)) <= 2:
+        """
+        Networks with 2 or less total hosts, like those with CIDR 31 and 32,
+        are special cases often used for peer-to-peer interfaces or host routes.
+        """
         print("Special configuration, be careful!")
         host_number = len(list(net))
-        first_host = net[0]
-        last_host = net[-1]
+        first_host = "Not Available"
+        last_host = "Not Available"
     else:
         host_number = len(list(net)) - 2
         first_host = net[1]
@@ -196,17 +202,26 @@ def main():
     :return: None
     """
     given_address = input("Enter IP address (default CIDR /24): ")
-    try:
-        if '/' in given_address:
-            add, cidr = given_address.split(sep='/')
-            full_address = given_address
-        else:
-            add = given_address
-            cidr = "24"
-            full_address = given_address + "/" + cidr
+    if '/' in given_address:
+        add, cidr = given_address.split(sep='/')
+        full_address = given_address
+    else:
+        add = given_address
+        cidr = "24"
+        full_address = given_address + "/" + cidr
 
-        address = ip.ip_address(add)
-        orig_net = ip.ip_network(full_address, strict=False)
+    try:
+        """
+        The following block of code will only be executed if the user input (given_address) is valid. If the address or
+        the netmask are not valid ones, then the program should throw an error and exit gracefully.
+        Note:
+        It would be possible to enter an IPv6 Address, but in that case the 'address' object should be IPV6Address or
+        the more generic ip_address must be used, in which case a generic ValueError exception is required to catch
+        the error. Similarly with 'orig_net' and an IPv6Network.
+        """
+        address = ip.IPv4Address(add)
+        orig_net = ip.IPv4Network(full_address, strict=False)
+        print(type(address), type(orig_net))
 
         address_information(address)
         network_information(orig_net)
@@ -228,8 +243,10 @@ def main():
 
     except ip.AddressValueError:
         print("This is not a valid address.")
+        quit()
     except ip.NetmaskValueError:
         print("This is not a valid netmask.")
+        quit()
 
 
 main()
