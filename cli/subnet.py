@@ -34,7 +34,7 @@ def network_information(net):
     :param net:
     :return: None
     """
-    if len(list(net)) <= 2:
+    if str(net.netmask) in ["255.255.255.254", "255,255,255,255"]:
         """
         Networks with 2 or less total hosts, like those with CIDR 31 and 32,
         are special cases often used for peer-to-peer interfaces or host routes.
@@ -91,7 +91,7 @@ def get_address_class(address):
     """
     Calculate network class based on the address.
 
-    :param address: IPv4Address
+    :param address: ip_address
     :return: String
     """
     class_a_p = ip.ip_network("10.0.0.0/8")
@@ -137,14 +137,20 @@ def get_address_class(address):
 def get_subnet_list(old_net, new_net=None):
     """
     Calculate subnet list based on CIDR.
+    Cheat Sheet: https://kthx.at/subnetmask/
 
-    :param old_net: IPv4Network
-    :param new_net: IPv4Network
-    :return: List of IPv4Network objects
+    :param old_net: ip_network
+    :param new_net: ip_network
+    :return: List of ip_network objects
     """
     address, cidr = str(old_net).split("/")
 
     if new_net is not None:
+        """
+        The following code calculates the subnets of a network in case of a custom setup. For example,
+        dividing a /24 network into a /28 one, will result in different subnets than a normal /28 network.
+        The same is true for using less bits for the network, for example turning a /25 into a /22 network.
+        """
         junk, mask = str(new_net).split("/")
 
         if int(mask) > int(cidr):
@@ -197,7 +203,7 @@ def show_subnets(subnet_list):
 
 def main():
     """
-    Ask user for IP address, calculate the necessary information
+    Ask user for IP address, calculate the necessary information.
 
     :return: None
     """
@@ -215,13 +221,17 @@ def main():
         The following block of code will only be executed if the user input (given_address) is valid. If the address or
         the netmask are not valid ones, then the program should throw an error and exit gracefully.
         Note:
-        It would be possible to enter an IPv6 Address, but in that case the 'address' object should be IPV6Address or
-        the more generic ip_address must be used, in which case a generic ValueError exception is required to catch
-        the error. Similarly with 'orig_net' and an IPv6Network.
+        If an IPv6Address is required, the following code has to be altered to:
+        address = ip.IPv6Address(add)
+        orig_net = ip.IPv6Network(full_address, strict=False)
+        If a more generic version is required, then the code should be altered to:
+        try:
+            address = ip.ip_address(add)
+            orig_net = ip.ip_network(full_address, strict=False)
+        except ValueError:
         """
         address = ip.IPv4Address(add)
         orig_net = ip.IPv4Network(full_address, strict=False)
-        print(type(address), type(orig_net))
 
         address_information(address)
         network_information(orig_net)

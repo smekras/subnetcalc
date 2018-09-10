@@ -22,7 +22,7 @@ class Network(ip.IPv4Network):
         subnet.print_subnet_information()
 
     def get_subnet_type(self):
-        if len(list(self.hosts())) <= 2:
+        if str(self.netmask) in ["255.255.255.254", "255.255.255.255"]:
             subnet_type = "Special"
         else:
             subnet_type = "Standard"
@@ -48,7 +48,7 @@ class Network(ip.IPv4Network):
             if int(cidr) == 24 or int(cidr) == 16 or int(cidr) == 8:
                 subnet_list = [self]
             else:
-                subnet_list = list(ip.ip_network(parent, strict=False).subnets())
+                subnet_list = list(ip.ip_network(parent, strict=False).subnets(new_prefix=int(cidr)))
         self.subnet_list = subnet_list  # Needed for subsequent calls
         return subnet_list
 
