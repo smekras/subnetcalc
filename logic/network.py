@@ -39,7 +39,9 @@ class Network(ip.IPv4Network):
             if int(new_cidr) > int(cidr):
                 subnet_list = list(self.subnets(new_prefix=int(new_cidr)))
             else:
-                subnet_list = list(self.supernet(new_prefix=int(new_cidr)))
+                # TODO: Fix supernet subnet list
+                new_network = self.supernet(new_prefix=int(new_cidr))
+                subnet_list = self.get_subnet_list(new_network)
         else:
             parent = ""
             if int(cidr) > 24:

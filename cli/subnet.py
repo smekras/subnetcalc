@@ -154,9 +154,11 @@ def get_subnet_list(old_net, new_net=None):
         junk, mask = str(new_net).split("/")
 
         if int(mask) > int(cidr):
-            subnet_list = list(ip.ip_network(old_net, strict=False).subnets(new_prefix=int(mask)))
+            subnet_list = list(old_net.subnets(new_prefix=int(mask)))
         else:
-            subnet_list = list(ip.ip_network(old_net, strict=False).supernet(new_prefix=int(mask)))
+            new_network = old_net.supernet(new_prefix=int(mask))
+            subnet_list = get_subnet_list(new_network)
+
     else:
         parent = ""
         if int(cidr) > 24:
