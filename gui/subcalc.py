@@ -1,5 +1,7 @@
 """
 Stergios Mekras
+
+stergios.mekras@gmail.com
 eaasmek@students.eaaa.dk
 """
 
@@ -42,14 +44,6 @@ class SubnetCalc(object):
     def get_address(self):
         self.address = self.con_frame.get_address()
         self.network = Network(str(self.address.address) + "/" + self.address.cidr)
-        sys.stdout = OutputRedirector(self.err_frame.info)
-        self.err_frame.info.configure(state=NORMAL)
-        if self.network.get_subnet_type() == "Special":
-            print("Special case, no proper distinction between network address, valid hosts, and broadcast address. "
-                  "Proceed with caution")
-        else:
-            self.err_frame.info.delete('1.0', END)
-        self.err_frame.info.configure(state=DISABLED)
         self.add_frame.display_info(self.address)
         self.con_frame.button_1.config(state=NORMAL)
         self.net_frame.display_info(self.network)
@@ -62,6 +56,11 @@ class SubnetCalc(object):
             self.subnets = self.network.subnet_list
             self.cus_frame.clear_info()
         sys.stdout = OutputRedirector(self.err_frame.info)
+        if self.network.get_subnet_type() == "Special":
+            print("Special case, no proper distinction between network address, valid hosts, and broadcast address. "
+                  "Proceed with caution")
+        else:
+            self.err_frame.info.delete('1.0', END)
         self.fill_subnet_list()
 
     def show_subnet_list(self):

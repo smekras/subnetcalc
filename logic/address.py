@@ -1,5 +1,7 @@
 """
 Stergios Mekras
+
+stergios.mekras@gmail.com
 eaasmek@students.eaaa.dk
 """
 

@@ -1,5 +1,7 @@
 """
 Stergios Mekras
+
+stergios.mekras@gmail.com
 eaasmek@students.eaaa.dk
 """
 
@@ -9,6 +11,7 @@ import ipaddress as ip
 class Network(ip.IPv4Network):
     def __init__(self, address="192.168.1.0/24"):
         super().__init__(address, strict=False)
+        self.new_cidr = None
         self.type = self.get_subnet_type()
         self.subnet_list = self.get_subnet_list()
         self.subnet_number = len(self.subnet_list)
@@ -22,7 +25,7 @@ class Network(ip.IPv4Network):
         subnet.print_subnet_information()
 
     def get_subnet_type(self):
-        if str(self.netmask) in ["255.255.255.254", "255.255.255.255"]:
+        if str(self.netmask) in ["0.0.0.0", "255.255.255.254", "255.255.255.255"]:
             subnet_type = "Special"
         else:
             subnet_type = "Standard"
@@ -30,6 +33,7 @@ class Network(ip.IPv4Network):
 
     def get_subnet_list(self, new_cidr=None):
         address, cidr = str(self.exploded).split("/")
+        self.new_cidr = new_cidr
 
         if new_cidr is not None:
             if int(new_cidr) > int(cidr):
