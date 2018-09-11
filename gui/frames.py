@@ -3,8 +3,6 @@ Stergios Mekras
 eaasmek@students.eaaa.dk
 """
 
-from tkinter.scrolledtext import *
-
 from gui.custom import *
 from logic.address import *
 
@@ -155,14 +153,19 @@ class CustomFrame(GenericFrame):
 class DebugFrame(GenericFrame):
     def __init__(self, app, **kw):
         super().__init__(app, **kw)
-        self.info = ScrolledText(self.frame, state=NORMAL, width=46, height=4)
+        self.infobox = Frame(self.frame)
+        self.info = Text(self.infobox, state=NORMAL, width=46, height=4)
+        self.scroll = Scrollbar(self.infobox, orient="vertical", command=self.info.yview)
 
+        self.info.config(yscrollcommand=self.scroll.set)
         self.label.config(text="Debug Console:")
 
         sys.stderr = OutputRedirector(self.info)
 
         self.label.pack()
-        self.info.pack()
+        self.infobox.pack()
+        self.info.pack(side='left')
+        self.scroll.pack(side='right', fill='y')
 
 
 class SubnetFrame(GenericFrame):
@@ -183,6 +186,7 @@ class SubnetFrame(GenericFrame):
         self.sub_list.column("#4", width=150, stretch=0)
         self.sub_view = self.sub_list
         self.scroll = Scrollbar(self.frame, orient="vertical", command=self.sub_list.yview)
+        self.sub_list.config(yscrollcommand=self.scroll.set)
 
         self.label.pack()
         self.sub_list.pack(side='left')

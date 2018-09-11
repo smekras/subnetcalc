@@ -93,6 +93,11 @@ class SubnetCalc(object):
 root = tk.ThemedTk()
 root.title("Subnet Calculator")
 root.resizable(False, False)
+"""
+List of available themes from root.get_themes()
+['classic', 'ubuntu', 'keramik_alt', 'elegance', 'equilux', 'black', 'default', 'arc', 'radiance', 
+'plastik', 'aquativo', 'keramik', 'clam', 'winxpblue', 'clearlooks', 'kroc', 'blue', 'alt']
+"""
 root.set_theme("ubuntu")
 
 app = SubnetCalc()
