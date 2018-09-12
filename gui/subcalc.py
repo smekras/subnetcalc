@@ -78,11 +78,10 @@ class SubnetCalc(object):
         if self.subnets is not None:
             for i in range(len(self.subnets)):
                 subnet = self.subnets[i]
-                # TODO: Get the list to work for /31 and /32
                 if str(subnet.netmask) == "255.255.255.255":
-                    subnet_ips = [subnet[0], subnet[0], subnet[0], subnet[0]]
+                    subnet_ips = [subnet[0], "Not Applicable", "Not Applicable", "Not Applicable"]
                 elif str(subnet.netmask) == "255.255.255.254":
-                    subnet_ips = [subnet[0], subnet[0], subnet[-1], subnet[-1]]
+                    subnet_ips = ["Not Applicable", subnet[0], subnet[-1], "Not Applicable"]
                 else:
                     subnet_ips = [subnet[0], subnet[1], subnet[-2], subnet[-1]]
                 self.sub_frame.sub_view.insert("", "end", text="#" + str(i),

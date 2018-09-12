@@ -64,15 +64,15 @@ class Network(ip.IPv4Network):
         return host_number
 
     def get_host_first(self):
-        if len(self.host_list) <= 2:
-            first_host = self[0]
+        if str(self.netmask) in ["255.255.255.254", "255.255.255.255"]:
+            first_host = "Not Applicable"
         else:
             first_host = self[1]
         return first_host
 
     def get_host_last(self):
-        if len(self.host_list) <= 2:
-            last_host = self[-1]
+        if str(self.netmask) in ["255.255.255.254", "255.255.255.255"]:
+            last_host = "Not Applicable"
         else:
             last_host = self[-2]
         return last_host
