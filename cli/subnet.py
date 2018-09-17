@@ -222,16 +222,17 @@ def main():
         """
         The following block of code will only be executed if the user input (given_address) is valid. If the address or
         the netmask are not valid ones, then the program should throw an error and exit gracefully.
-        Note:
         If an IPv6Address is required, the following code has to be altered to:
-        address = ip.IPv6Address(add)
-        orig_net = ip.IPv6Network(full_address, strict=False)
-        If a more generic version is required, then the code should be altered to:
-        try:
-            address = ip.ip_address(add)
-            orig_net = ip.ip_network(full_address, strict=False)
-        except ValueError:
         """
+        # address = ip.IPv6Address(add)
+        # orig_net = ip.IPv6Network(full_address, strict=False)
+        """ If a more generic version is required, then the code should be altered to: """
+        # try:
+        #     address = ip.ip_address(add)
+        #     orig_net = ip.ip_network(full_address, strict=False)
+        # except ValueError:
+        """ If the above changes are made, other alterations need to happen for the program to work properly """
+
         address = ip.IPv4Address(add)
         orig_net = ip.IPv4Network(full_address, strict=False)
 
