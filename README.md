@@ -9,6 +9,7 @@ Just a simple subnet calculator.
 - logic/address.py
 - logic/network.py
 - logic/main.py: The main program
+- CHAANGELOG.md: The project's changelog
 - README.md: This file
 
 ### TODO
